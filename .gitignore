@@ -216,3 +216,52 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# ==========================================
+# A.R.M.O.R. - Project Specific Protections
+# ==========================================
+
+# --- AI Models & Datasets ---
+# Blokuje wagi modeli YOLOv8 (są za duże na gita i to Twoje główne IP)
+*.pt
+*.onnx
+*.engine
+*.tensorrt
+
+# Blokuje całe foldery z danymi treningowymi i logami YOLO
+datasets/
+dataset/
+runs/
+wandb/
+
+# --- Hardware & ESP32 ---
+# Jeśli przez przypadek wrzucisz tu kod mikrokontrolera
+.pio/
+.platformio/
+build/
+*.bin
+*.elf
+*.hex
+
+# --- Mobile App (Flutter / React Native) ---
+# Blokuje ewentualne pozostałości po budowaniu aplikacji HUD
+node_modules/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# --- Multimedia / Raw Data ---
+# Chcemy publicznie tylko małe pliki do README, nie wielogigabajtowe nagrania testowe
+*.mp4
+*.avi
+*.mkv
+*.mov
+!media/*.gif  # Wyjątek: pozwól na gify prezentacyjne w folderze media
+
+# --- Credentials & Configs (Krytyczne!) ---
+# Blokuje klucze VPN, konfiguracje sieciowe i adresy IP
+secrets.*/
+config.json
+*.env
+tailscale/
