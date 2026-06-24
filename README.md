@@ -8,7 +8,7 @@ The system architecture is built on complete signature neutrality with dynamic t
 
 ### Model-Based Detection & Identification
 
-- Real-time recognition of specific combat vehicle types and modifications (e.g. T-72, T-90, Leopard, Abrams) using an optimized YOLOv8 model.
+- Real-time classification and recognition of combat vehicles strictly based on operational factions (**NATO** vs. **Eastern Block**) using an optimized YOLOv8 model.
 - Detection accounts for structural anomalies and atypical units (collective class: **Unidentified**).
 
 ### Dynamic ROE (Rules of Engagement) Configuration
