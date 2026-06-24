@@ -2,7 +2,7 @@
 
 A.R.M.O.R. is a proprietary, real-time tactical assistant system designed for autonomous and remote-controlled tracked platforms. The system integrates deep neural networks with computer vision algorithms for automated detection, tracking, targeting, and monocular distance estimation of ground targets.
 
-The system architecture is built on complete signature neutrality with dynamic target configuration capabilities.
+he system architecture focuses on thermal signature mitigation, passive acquisition, and cryptographic transmission security, with dynamic target configuration capabilities.
 
 ## Core Design Assumptions
 
@@ -38,29 +38,29 @@ The system architecture is built on complete signature neutrality with dynamic t
 
 ## Architecture & Communication
 
-### Distributed Tactical Architecture (Offloaded Local Inference)
-To maximize vehicle operational time, payload capacity, and thermal efficiency, the system utilizes a **Distributed Tactical Architecture** with offloaded local inference. 
+### Hybrid Tactical Architecture (Cellular Relay Grid)
+To achieve maximum physical mobility and operational flexibility without sacrificing heavy computational power, the system utilizes a **Hybrid Tactical Architecture** with a mobile gateway relay. Instead of forcing the operator to transport a high-performance workstation to the field, the system bridges the local physical edge with a remote processing node via a secure, peer-to-peer VPN tunnel (Tailscale).
 
-Instead of running heavy deep learning models natively on the mobile platform (which would require power-hungry and heavy embedded hardware), the system splits tasks into a low-latency local grid. The entire pipeline remains completely independent of WAN/Internet connectivity, ensuring resistance to cloud-disruption and external EW (Electronic Warfare) tactics.
+### Component Segmentation
+1. **Kinematic Execution Node (Onboard Platform):** A low-power ESP32 microcontroller operating at the physical edge. It manages the vehicle's local Wi-Fi connection, telemetry ingestion, and low-level hardware execution (PWM servo controls for turret alignment and drive-train operation).
+2. **Mobile Gateway & Tactical HUD Node (Operator Smartphone):** A portable relay carried by the operator. It interfaces locally with the vehicle via Wi-Fi to capture the raw video stream and handles real-time local HUD rendering. Concurrently, it acts as an internet gateway, forwarding the stream to the remote processing station over an encrypted 5G/LTE network.
+3. **Remote Processing Server (Base Station):** A stationary, high-performance home computer equipped with an NVIDIA GeForce RTX 4070 (Tensor Cores). It hosts the YOLOv8 faction detection pipeline, ByteTrack tracking, and OpenCV-based IFF logic, operating continuously as an automated background daemon.
 
-### Component Segmentation:
-1. **Kinematic Execution Node (Onboard Platform):** A low-power microcontroller (ESP32) operating at the physical edge. Its sole responsibility is RF communication management, telemetry ingestion, and low-level hardware execution (PWM servo controls for turret alignment and drive-train operation).
-2. **Tactical Command Node (Base Station / Operator Terminal):** A high-performance local processing station (NVIDIA GeForce RTX 4070 with Tensor Cores). This node acts as the local central server, hosting the YOLOv8 object detection pipeline, ByteTrack tracking, and computer-vision-based IFF logic.
+### Design Justification (Engineering Trade-offs)
+- **Thermal Signature Reduction:** Offloading AI inference prevents high thermal emissions on the tracked vehicle, drastically reducing its infrared and thermal signature on the field.
+- **Power Optimization:** Eliminating onboard GPU/NPU hardware minimizes power draw, dramatically increasing battery life and operational range of the tracked mobile platform.
+- **Cost-to-Performance & Weight Ratio:** Allows the use of full-scale desktop architectures (Tensor Cores) to achieve massive FPS tracking speeds without payload weight penalties on a 1:16 scale chassis.
+- **Transmission Security:** Utilizing a peer-to-peer VPN (Tailscale) layer guarantees that all telemetry and video feeds are fully encrypted, protecting the system from unauthorized interception and spoofing attacks.
 
-### Design Justification (Engineering Trade-offs):
-- **Signature Reduction:** Offloading AI inference prevents high thermal emissions on the tracked vehicle, reducing its thermal signature.
-- **Power Optimization:** Eliminating onboard GPU/NPU hardware dramatically increases battery life and operational range of the tracked platform.
-- **Cost-to-Performance Ratio:** Allows the use of full-scale desktop architectures (Tensor Cores) to achieve massive FPS tracking speeds without payload weight penalties.
-
-### Uplink
-- The vehicle's optical module captures a raw video stream.
-- The stream is transmitted directly to the operator terminal via low-latency Wi-Fi protocol.
-- Real-time AI processing (detection, tracking, IFF) is performed entirely on the operator's GPU.
+### Uplink (Video Pipeline)
+- The vehicle's optical module captures a raw video stream and transmits it to the smartphone relay via low-latency local Wi-Fi.
+- The smartphone compresses the stream using hardware-accelerated codecs (H.264/H.265) and pushes it via WebRTC/RTSP over the 5G VPN tunnel directly to the remote server.
+- Real-time AI processing (faction detection, tracking, IFF) is performed entirely on the remote host's GPU.
 
 ### Downlink & Telemetry
-- Processed targeting data, distance calculations, and HUD information are generated at the operator station.
-- Return control commands, servo angles, and targeting coordinates are transmitted back to the vehicle's ESP32 control board.
-- **Protocol:** Communication is performed using raw, lightweight **UDP datagrams** instead of TCP/WebSockets. This guarantees maximum freshness of control packages and eliminates latency spikes (*jitter*) inherent in retransmission-based protocols during real-time combat platform operation.
+- Processed targeting data, distance calculations, and dynamic HUD layers are generated at the remote server and transmitted back to the smartphone relay.
+- The smartphone instantly bridges these incoming control commands, servo angles, and targeting coordinates back to the vehicle's ESP32 control board.
+- **Protocol:** Communication across the entire network layer is performed using raw, lightweight **UDP datagrams**. This guarantees maximum freshness of control packages and eliminates latency spikes (*jitter*) inherent in retransmission-based protocols during real-time platform operation.
 
 ## Software Stack
 
