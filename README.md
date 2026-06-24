@@ -38,23 +38,22 @@ The system architecture is built on complete signature neutrality with dynamic t
 
 ## Architecture & Communication
 
-### Standalone Tactical Edge Node
+### Standalone Tactical Edge Node & Hybrid Topology
+The system eliminates the need for external cloud server infrastructure and WAN internet connectivity, ensuring complete RF-emission control and resilience to electronic warfare (EW). 
 
-The system eliminates the need for external server infrastructure and WAN internet connectivity.
-
-The onboard microprocessor unit acts as an independent base station (Access Point / Local Server).
+The architecture is divided into two distinct layers:
+1. **Edge Execution Layer (Onboard):** A low-power microcontroller unit (ESP32) acts as the physical vehicle controller and local Access Point (AP). It directly interfaces with high-torque servos, drive-train motor controllers (via PWM), and manages raw sensor output.
+2. **Tactical Processing Node (Operator Terminal):** A high-performance station equipped with a dedicated GPU accelerator (NVIDIA GeForce RTX 4070 utilizing Tensor Cores) responsible for heavy computer vision workloads and AI inference.
 
 ### Uplink
-
 - The vehicle's optical module captures a raw video stream.
-- The stream is transmitted directly to the operator terminal.
-- AI processing is performed on a dedicated GPU accelerator (NVIDIA GeForce RTX 4070) utilizing Tensor Cores.
+- The stream is transmitted directly to the operator terminal via low-latency Wi-Fi protocol.
+- Real-time AI processing (detection, tracking, IFF) is performed entirely on the operator's GPU.
 
-### Downlink
-
+### Downlink & Telemetry
 - Processed targeting data, distance calculations, and HUD information are generated at the operator station.
-- Return control commands and targeting coordinates are transmitted back to the control board.
-- Communication is performed using lightweight telemetry packets (WebSockets / local protocol) to minimize latency.
+- Return control commands, servo angles, and targeting coordinates are transmitted back to the vehicle's ESP32 control board.
+- **Protocol:** Communication is performed using raw, lightweight **UDP datagrams** instead of TCP/WebSockets. This guarantees maximum freshness of control packages and eliminates latency spikes (*jitter*) inherent in retransmission-based protocols during real-time combat platform operation.
 
 ## Software Stack
 
@@ -62,6 +61,12 @@ The onboard microprocessor unit acts as an independent base station (Access Poin
 - Ultralytics YOLOv8
 - OpenCV
 - Roboflow
+  
+## Hardware Stack (Test & Target Platforms)
+- **Primary Control Unit:** ESP32 (NodeMCU / custom board)
+- **Actuators:** High-torque PWM Servos (Turret Azimuth/Elevation), ESC Motor Controllers
+- **Inference Hardware:** NVIDIA GeForce RTX 4070 (TensorRT optimized)
+- **Scale Prototyping Platform:** 1:16 Tracked Armor Chassis (Heng Long 7.0 system integration)
 
 ### Functions
 
@@ -80,3 +85,6 @@ The onboard microprocessor unit acts as an independent base station (Access Poin
 - [ ] Compilation and training of production weights for the YOLOv8 model
 - [ ] Implementation of the monocular distance estimation module and IFF script in OpenCV
 - [ ] Integration of physical guidance systems (servos) with the control logic
+- [ ] Implement of a hardware-level Fail-Safe watchdog on ESP32 (auto-stop on telemetry timeout)
+- [ ] Integration of real-time voltage and RSSI diagnostics into the UDP telemetry stream
+- [ ] Predictive target interception logic (Lead Angle calculation based on target velocity vectors)
