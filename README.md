@@ -38,12 +38,19 @@ The system architecture is built on complete signature neutrality with dynamic t
 
 ## Architecture & Communication
 
-### Standalone Tactical Edge Node & Hybrid Topology
-The system eliminates the need for external cloud server infrastructure and WAN internet connectivity, ensuring complete RF-emission control and resilience to electronic warfare (EW). 
+### Distributed Tactical Architecture (Offloaded Local Inference)
+To maximize vehicle operational time, payload capacity, and thermal efficiency, the system utilizes a **Distributed Tactical Architecture** with offloaded local inference. 
 
-The architecture is divided into two distinct layers:
-1. **Edge Execution Layer (Onboard):** A low-power microcontroller unit (ESP32) acts as the physical vehicle controller and local Access Point (AP). It directly interfaces with high-torque servos, drive-train motor controllers (via PWM), and manages raw sensor output.
-2. **Tactical Processing Node (Operator Terminal):** A high-performance station equipped with a dedicated GPU accelerator (NVIDIA GeForce RTX 4070 utilizing Tensor Cores) responsible for heavy computer vision workloads and AI inference.
+Instead of running heavy deep learning models natively on the mobile platform (which would require power-hungry and heavy embedded hardware), the system splits tasks into a low-latency local grid. The entire pipeline remains completely independent of WAN/Internet connectivity, ensuring resistance to cloud-disruption and external EW (Electronic Warfare) tactics.
+
+### Component Segmentation:
+1. **Kinematic Execution Node (Onboard Platform):** A low-power microcontroller (ESP32) operating at the physical edge. Its sole responsibility is RF communication management, telemetry ingestion, and low-level hardware execution (PWM servo controls for turret alignment and drive-train operation).
+2. **Tactical Command Node (Base Station / Operator Terminal):** A high-performance local processing station (NVIDIA GeForce RTX 4070 with Tensor Cores). This node acts as the local central server, hosting the YOLOv8 object detection pipeline, ByteTrack tracking, and computer-vision-based IFF logic.
+
+### Design Justification (Engineering Trade-offs):
+- **Signature Reduction:** Offloading AI inference prevents high thermal emissions on the tracked vehicle, reducing its thermal signature.
+- **Power Optimization:** Eliminating onboard GPU/NPU hardware dramatically increases battery life and operational range of the tracked platform.
+- **Cost-to-Performance Ratio:** Allows the use of full-scale desktop architectures (Tensor Cores) to achieve massive FPS tracking speeds without payload weight penalties.
 
 ### Uplink
 - The vehicle's optical module captures a raw video stream.
