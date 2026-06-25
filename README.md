@@ -2,7 +2,7 @@
 
 A.R.M.O.R. is a proprietary, real-time tactical assistant system designed for autonomous and remote-controlled tracked platforms. The system integrates deep neural networks with computer vision algorithms for automated detection, tracking, targeting, and monocular distance estimation of ground targets.
 
-he system architecture focuses on thermal signature mitigation, passive acquisition, and cryptographic transmission security, with dynamic target configuration capabilities.
+The system architecture focuses on thermal signature mitigation, passive acquisition, and cryptographic transmission security, with dynamic target configuration capabilities.
 
 ## Core Design Assumptions
 
@@ -50,7 +50,7 @@ To achieve maximum physical mobility and operational flexibility without sacrifi
 - **Thermal Signature Reduction:** Offloading AI inference prevents high thermal emissions on the tracked vehicle, drastically reducing its infrared and thermal signature on the field.
 - **Power Optimization:** Eliminating onboard GPU/NPU hardware minimizes power draw, dramatically increasing battery life and operational range of the tracked mobile platform.
 - **Cost-to-Performance & Weight Ratio:** Allows the use of full-scale desktop architectures (Tensor Cores) to achieve massive FPS tracking speeds without payload weight penalties on a 1:16 scale chassis.
-- **Transmission Security:** Utilizing a peer-to-peer VPN (Tailscale) layer guarantees that all telemetry and video feeds are fully encrypted, protecting the system from unauthorized interception and spoofing attacks.
+- **Transmission Security:** Utilizing a VPN (Tailscale) layer guarantees that all telemetry and video feeds are fully encrypted, protecting the system from unauthorized interception and spoofing attacks.
 
 ### Uplink (Video Pipeline)
 - The vehicle's optical module captures a raw video stream and transmits it to the smartphone relay via low-latency local Wi-Fi.
@@ -64,7 +64,7 @@ To achieve maximum physical mobility and operational flexibility without sacrifi
 
 ## Software Stack
 
-- Python 3.x
+- Python 3.11
 - Ultralytics YOLOv8
 - OpenCV
 - Roboflow
